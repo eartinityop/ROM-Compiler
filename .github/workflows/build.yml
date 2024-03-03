@@ -1,6 +1,6 @@
 name: Start build
 on:
-  workflow_dispatch:
+  self-hosted:
     # Various inputs to simplify usage of workflow.
     inputs:
       WORKING_DIR:
