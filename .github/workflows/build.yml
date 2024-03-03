@@ -30,6 +30,9 @@ on:
       ROM_MANIFEST_BRANCH:
         description: "Branch of the ROM manifest"
         required: true
+      ANDROID_VERSION: 
+        description: "Android version of the ROM"
+        required: true
       BUILD_TYPE:
         description: 'Type of build:'
         required: true
@@ -43,7 +46,7 @@ on:
 
 jobs:
   test:
-    name: Clone Manifest, Initialize the repository, Sync the repository 
+    name: Clone Manifest, Start Build
     runs-on: self-hosted
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
@@ -52,6 +55,12 @@ jobs:
       # Check-out in order to access the repository's files.
     - name: Check-out to repository
       uses: actions/checkout@v4
+
+      # Notify to telegram 
+    - name: Notify to telegram
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot5635044382:AAHFzlXfdilMQaM5SvlqN70RjDlEYRjx9XU/sendMessage" \ -d "chat_id=-1001803186438" \ -d "text=Build for ${{ github.event.inputs.WORKING_DIR }} has been started! ROM Name: ${{ github.event.inputs.ROM_NAME }} ROM Branch: ${{ github.event.inputs.ROM_MANIFEST_BRANCH }} BUILD Type: ${{ github.event.inputs.BUILD_TYPE }} ANDROID Version: ${{ github.event.inputs.ANDROID_VERSION }}Job link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
+
 
       # Set-up a spearate directory for the device.
     - name: Set-up workspace environment
