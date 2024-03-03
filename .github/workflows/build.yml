@@ -21,9 +21,6 @@ on:
       LUNCH_NAME:
         description: "Product to build:"
         required: true
-      BUILD_COMMAND:
-        description: "Command to be used for compiling:"
-        required: true
       ROM_MANIFEST_LINK:
         description: "Enter the manifest link of the ROM you want to compile"
         required: true
@@ -102,7 +99,7 @@ jobs:
       run: |
         . build/envsetup.sh
         lunch ${{ github.event.inputs.LUNCH_NAME }}-${{ github.event.inputs.BUILD_TYPE }}
-        ${{ github.event.inputs.BUILD_COMMAND }}
+        mka bacon
       continue-on-error: true
       
       # Upload error.log file if compilation failed.
