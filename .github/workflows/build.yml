@@ -9,9 +9,6 @@ on:
       ROM_NAME:
         description: "Choose a ROM which you want to build:"
         required: true
-      REMOVALS:
-        description: "Folders to be removed before syncing:"
-        required: false
       LOCAL_MANIFEST:
         description: "Personal local manifest [repository or raw]:" 
         required: true
