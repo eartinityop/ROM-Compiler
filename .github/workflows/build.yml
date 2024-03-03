@@ -30,6 +30,9 @@ on:
       ROM_MANIFEST_LINK:
         description: "Enter the manifest link of the ROM you want to compile"
         required: true
+      ROM_MANIFEST_BRANCH:
+        description: "Branch of the ROM manifest"
+        required: true
       BUILD_TYPE:
         description: 'Type of build:'
         required: true
@@ -76,7 +79,7 @@ jobs:
       # Initialize the previously choosen 'repo' project.
     - name: Start syncing the repository 
       run: |
-        repo init -u ${{ github.event.inputs.ROM_MANIFEST_LINK }}
+        repo init -u ${{ github.event.inputs.ROM_MANIFEST_LINK }} -b ${{ github.event.inputs.ROM_MANIFEST_BRANCH }}
         repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync 
         
       # Only reach this wheter the user killed the workflow.
