@@ -53,11 +53,17 @@ jobs:
     - name: Check-out to repository
       uses: actions/checkout@v4
 
+      # Setup Variables
+    - name: Set up variables
+        run: |
+          text="Build for ${{ github.event.inputs.DEVICE_NAME }} has been started!\nROM Name: ${{ github.event.inputs.ROM_NAME }}\nROM Branch: ${{ github.event.inputs.ROM_MANIFEST_BRANCH }}\nBUILD Type: ${{ github.event.inputs.BUILD_TYPE }}\nANDROID Version: ${{ github.event.inputs.ANDROID_VERSION }}\nJob link: https://github.com/<YOUR_USERNAME>/<YOUR_REPOSITORY>/actions/runs/${{ github.run_id }}"
+
       # Notify to telegram 
     - name: Notify to telegram
       run: |
-        curl -s -X POST "https://api.telegram.org/bot5635044382:AAHFzlXfdilMQaM5SvlqN70RjDlEYRjx9XU/sendMessage" \ -d "chat_id=-1001803186438" \ -d "text=Build for ${{ github.event.inputs.WORKING_DIR }} has been started! ROM Name: ${{ github.event.inputs.ROM_NAME }} ROM Branch: ${{ github.event.inputs.ROM_MANIFEST_BRANCH }} BUILD Type: ${{ github.event.inputs.BUILD_TYPE }} ANDROID Version: ${{ github.event.inputs.ANDROID_VERSION }}Job link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
-
+        curl -s -X POST "https://api.telegram.org/bot5635044382:AAHFzlXfdilMQaM5SvlqN70RjDlEYRjx9XU/sendMessage" \
+          -d "chat_id=-1001803186438" \
+          -d "text=$text"
 
       # Set-up a spearate directory for the device.
     - name: Set-up workspace environment
