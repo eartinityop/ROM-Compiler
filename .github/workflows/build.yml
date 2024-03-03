@@ -73,11 +73,15 @@ jobs:
         rm -rf .repo/local_manifests 
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests
 
-      # Initialize the previously choosen 'repo' project.
+      # Initialize the previously chosen 'repo' project.
     - name: Start syncing the repository 
       run: |
-        repo init -u ${{ github.event.inputs.ROM_MANIFEST_LINK }} -b ${{ github.event.inputs.ROM_MANIFEST_BRANCH }}
-        repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync 
+        while true; do
+          repo init -u ${{ github.event.inputs.ROM_MANIFEST_LINK }} -b ${{ github.event.inputs.ROM_MANIFEST_BRANCH }} &&
+          repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync &&
+          break
+        done
+
         
       # Only reach this wheter the user killed the workflow.
     - name: Execute if the job is cancelled
@@ -99,6 +103,10 @@ jobs:
       with:
         files: |
           out/error.log
+        name: error.log
+        tag_name: ${{ github.run_id }}
+        body: |
+          Target: error.log
 
       # Upload artifacts to releases.
     - name: Upload to repository's releases page
