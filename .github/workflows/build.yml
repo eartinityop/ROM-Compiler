@@ -17,16 +17,16 @@ jobs:
 
       - name: Set up variables
         run: |
-          WORKING_DIR="los"
-          ROM_NAME="LineageOS"
-          LOCAL_MANIFEST="https://github.com/eartinityop/local_manifest"
-          LOCAL_MANIFEST_BRANCH="lineage"
-          DEVICE_NAME="r5x"
-          LUNCH_NAME="lineage_r5x"
-          ROM_MANIFEST_LINK="https://github.com/LineageOS/android"
-          ROM_MANIFEST_BRANCH="lineage-20.0"
-          ANDROID_VERSION="13"
-          BUILD_TYPE="userdebug" # or choose from 'eng', 'userdebug', 'user'
+          export WORKING_DIR="los"
+          export ROM_NAME="LineageOS"
+          export LOCAL_MANIFEST="https://github.com/eartinityop/local_manifest"
+          export LOCAL_MANIFEST_BRANCH="lineage"
+          export DEVICE_NAME="r5x"
+          export LUNCH_NAME="lineage_r5x"
+          export ROM_MANIFEST_LINK="https://github.com/LineageOS/android"
+          export ROM_MANIFEST_BRANCH="lineage-20.0"
+          export ANDROID_VERSION="13"
+          export BUILD_TYPE="userdebug" # or choose from 'eng', 'userdebug', 'user'
 
           text="Build for $DEVICE_NAME has been started!\nROM Name: $ROM_NAME\nROM Branch: $ROM_MANIFEST_BRANCH\nBUILD Type: $BUILD_TYPE\nANDROID Version: $ANDROID_VERSION\nJob link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
 
