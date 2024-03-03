@@ -1,6 +1,6 @@
 name: Start build
 on:
-  workflow-dispatch:
+  workflow_dispatch:
     # Various inputs to simplify usage of workflow.
     inputs:
       WORKING_DIR:
