@@ -98,7 +98,7 @@ jobs:
       # Only reach this wheter the user killed the workflow.
     - name: Execute if the job is cancelled
       if: ${{ cancelled() }}
-      run: cd .. && rm -rf ${{ github.event.inputs.WORKING_DIR }}
+      run: pwd cd .. && cd.. && cd.. && rm -rf ROM-Compiler
 
       # Start compilation 
     - name: Start compiling ${{ github.event.inputs.ROM_NAME }}
