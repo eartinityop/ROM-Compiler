@@ -11,23 +11,24 @@ jobs:
     runs-on: self-hosted
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
+    env:
+      WORKING_DIR: "your_working_directory_name"
+      ROM_NAME: "your_rom_name"
+      LOCAL_MANIFEST: "your_local_manifest_repository_or_raw"
+      LOCAL_MANIFEST_BRANCH: "your_local_manifest_branch"
+      DEVICE_NAME: "your_device_codename"
+      LUNCH_NAME: "your_product_to_build"
+      ROM_MANIFEST_LINK: "your_rom_manifest_link"
+      ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
+      ANDROID_VERSION: "your_android_version"
+      BUILD_TYPE: "userdebug" # or choose from 'eng', 'userdebug', 'user'
+
     steps:
       - name: Check-out to repository
         uses: actions/checkout@v4
 
       - name: Set up variables
         run: |
-          export WORKING_DIR="los"
-          export ROM_NAME="LineageOS"
-          export LOCAL_MANIFEST="https://github.com/eartinityop/local_manifest"
-          export LOCAL_MANIFEST_BRANCH="lineage"
-          export DEVICE_NAME="r5x"
-          export LUNCH_NAME="lineage_r5x"
-          export ROM_MANIFEST_LINK="https://github.com/LineageOS/android"
-          export ROM_MANIFEST_BRANCH="lineage-20.0"
-          export ANDROID_VERSION="13"
-          export BUILD_TYPE="userdebug" # or choose from 'eng', 'userdebug', 'user'
-
           text="Build for $DEVICE_NAME has been started!\nROM Name: $ROM_NAME\nROM Branch: $ROM_MANIFEST_BRANCH\nBUILD Type: $BUILD_TYPE\nANDROID Version: $ANDROID_VERSION\nJob link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
 
       - name: Notify to telegram
