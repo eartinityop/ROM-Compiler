@@ -1,45 +1,9 @@
 name: Start build
 on:
-  workflow_dispatch:
-    # Various inputs to simplify usage of workflow.
-    inputs:
-      WORKING_DIR:
-        description: "Name of the directory in which you want to sync the source and start compilation:"
-        required: true
-      ROM_NAME:
-        description: "Choose a ROM which you want to build:"
-        required: true
-      LOCAL_MANIFEST:
-        description: "Personal local manifest [repository or raw]:" 
-        required: true
-      LOCAL_MANIFEST_BRANCH:
-        description: "Personal local manifest's branch:"
-        required: false
-      DEVICE_NAME:
-        description: "Device's codename:"
-        required: true
-      LUNCH_NAME:
-        description: "Product to build:"
-        required: true
-      ROM_MANIFEST_LINK:
-        description: "Enter the manifest link of the ROM you want to compile"
-        required: true
-      ROM_MANIFEST_BRANCH:
-        description: "Branch of the ROM manifest"
-        required: true
-      ANDROID_VERSION: 
-        description: "Android version of the ROM"
-        required: true
-      BUILD_TYPE:
-        description: 'Type of build:'
-        required: true
-        default: 'userdebug'
-        type: choice
-        options: 
-        - 'eng'
-        - 'userdebug'
-        - 'user' 
-      
+  pull_request:
+    types: [opened]
+    branches:
+      - main
 
 jobs:
   test:
@@ -48,92 +12,90 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
+      - name: Check-out to repository
+        uses: actions/checkout@v4
 
-      # Check-out in order to access the repository's files.
-    - name: Check-out to repository
-      uses: actions/checkout@v4
+      - name: Set up variables
+        run: |
+          WORKING_DIR="los"
+          ROM_NAME="LineageOS"
+          LOCAL_MANIFEST="https://github.com/eartinityop/local_manifest"
+          LOCAL_MANIFEST_BRANCH="lineage"
+          DEVICE_NAME="r5x"
+          LUNCH_NAME="lineage_r5x"
+          ROM_MANIFEST_LINK="https://github.com/LineageOS/android"
+          ROM_MANIFEST_BRANCH="lineage-20.0"
+          ANDROID_VERSION="13"
+          BUILD_TYPE="userdebug" # or choose from 'eng', 'userdebug', 'user'
 
-      # Setup Variables
-    - name: Set up variables
-      run: |
-        text="Build for ${{ github.event.inputs.DEVICE_NAME }} has been started!\nROM Name: ${{ github.event.inputs.ROM_NAME }}\nROM Branch: ${{ github.event.inputs.ROM_MANIFEST_BRANCH }}\nBUILD Type: ${{ github.event.inputs.BUILD_TYPE }}\nANDROID Version: ${{ github.event.inputs.ANDROID_VERSION }}\nJob link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
+          text="Build for $DEVICE_NAME has been started!\nROM Name: $ROM_NAME\nROM Branch: $ROM_MANIFEST_BRANCH\nBUILD Type: $BUILD_TYPE\nANDROID Version: $ANDROID_VERSION\nJob link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
 
-      # Notify to telegram 
-    - name: Notify to telegram
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot5635044382:AAHFzlXfdilMQaM5SvlqN70RjDlEYRjx9XU/sendMessage" \
-          -d "chat_id=-1001803186438" \
-          -d "text=$text"
+      - name: Notify to telegram
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot5635044382:AAHFzlXfdilMQaM5SvlqN70RjDishZ9XU/sendMessage" \
+            -d "chat_id=-1001803186438" \
+            -d "text=$text"
 
-      # Set-up a spearate directory for the device.
-    - name: Set-up workspace environment
-      run: |
-        mkdir ${{ github.event.inputs.WORKING_DIR }}
-        cd ${{ github.event.inputs.WORKING_DIR }}
-        neofetch
-      continue-on-error: true
+      - name: Set-up workspace environment
+        run: |
+          mkdir $WORKING_DIR
+          cd $WORKING_DIR
+          neofetch
+        continue-on-error: true
 
-      # Generate 'git' credential in base of the workflow's author.
-    - name: Set-up 'git' credential(s)
-      run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-        
-      # Clone local manifest to sync device trees.
-    - name: Clone local manifest
-      run: |
-        rm -rf .repo/local_manifests 
-        git clone ${{ github.event.inputs.LOCAL_MANIFEST }} -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests
+      - name: Set-up 'git' credential(s)
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          
+      - name: Clone local manifest
+        run: |
+          rm -rf .repo/local_manifests 
+          git clone $LOCAL_MANIFEST -b $LOCAL_MANIFEST_BRANCH .repo/local_manifests
 
-      # Initialize the previously chosen 'repo' project.
-    - name: Start syncing the repository 
-      run: |
-        while true; do
-          repo init -u ${{ github.event.inputs.ROM_MANIFEST_LINK }} -b ${{ github.event.inputs.ROM_MANIFEST_BRANCH }} &&
-          repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync &&
-          break
-        done
+      - name: Start syncing the repository 
+        run: |
+          while true; do
+            repo init -u $ROM_MANIFEST_LINK -b $ROM_MANIFEST_BRANCH &&
+            repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync &&
+            break
+          done
 
-        
-      # Only reach this wheter the user killed the workflow.
-    - name: Execute if the job is cancelled
-      if: ${{ cancelled() }}
-      run: pwd && cd && pwd && cd actions-runner && cd work && rm -rf ROM-Compiler
+      - name: Execute if the job is cancelled
+        if: ${{ cancelled() }}
+        run: pwd && cd && pwd && cd actions-runner && cd work && rm -rf ROM-Compiler
 
-      # Start compilation 
-    - name: Start compiling ${{ github.event.inputs.ROM_NAME }}
-      run: |
-        . build/envsetup.sh
-        lunch ${{ github.event.inputs.LUNCH_NAME }}-${{ github.event.inputs.BUILD_TYPE }}
-        mka bacon
-      continue-on-error: true
+      - name: Start compiling $ROM_NAME
+        run: |
+          . build/envsetup.sh
+          lunch $LUNCH_NAME-$BUILD_TYPE
+          mka bacon
+        continue-on-error: true
       
-      # Upload error.log file if compilation failed.
-    - name: Upload error.log to releases
-      if: failure()
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          out/error.log
-        name: error.log
-        tag_name: ${{ github.run_id }}
-        body: |
-          Target: error.log
+      - name: Upload error.log to releases
+        if: failure()
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            out/error.log
+          name: error.log
+          tag_name: ${{ github.run_id }}
+          body: |
+            Target: error.log
 
-      # Upload artifacts to releases.
-    - name: Upload to repository's releases page
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery.img
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/boot.img
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/vendor_boot.img
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/vendor.img
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/system.img
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip
-        name: ${{ github.event.inputs.LUNCH_NAME }}-${{ github.event.inputs.BUILD_TYPE }}
-        tag_name: ${{ github.run_id }}
-        body: |
-          Target: ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }}
-      env:
-        TOKEN: ${{ secrets.TOKEN }}
+      - name: Upload to repository's releases page
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            out/target/product/$DEVICE_NAME/recovery.img
+            out/target/product/$DEVICE_NAME/boot.img
+            out/target/product/$DEVICE_NAME/vendor_boot.img
+            out/target/product/$DEVICE_NAME/vendor.img
+            out/target/product/$DEVICE_NAME/system.img
+            out/target/product/$DEVICE_NAME/*.zip
+          name: $LUNCH_NAME-$BUILD_TYPE
+          tag_name: ${{ github.run_id }}
+          body: |
+            Target: $LUNCH_NAME-$BUILD_TYPE
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
