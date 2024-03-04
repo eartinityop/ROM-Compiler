@@ -90,6 +90,7 @@ jobs:
           prerelease: false
           repository: username/repo-name  # Replace with the username and repository name of the forked repository
 
+
       # Upload your file as an asset to the release of the forked repository
       - name: Upload Asset
         if: failure()
@@ -101,6 +102,16 @@ jobs:
           asset_path: out/error.log  # Replace with the path to your file
           asset_name: error.log  # Replace with the name you want the file to have in the release
           asset_content_type: text/plain  # Replace with the appropriate content type for your file
+
+      # Cleanup before exiting
+      - name: Cleanup directory
+        if: failure()
+        run: |
+          pwd
+          cd
+          cd actions-runner
+          cd work
+          rm -rf ROM-Compiler 
 
 
       - name: Upload to repository's releases page
