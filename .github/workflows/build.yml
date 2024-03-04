@@ -59,11 +59,8 @@ jobs:
 
       - name: Start syncing the repository 
         run: |
-          while true; do
             repo init -u $ROM_MANIFEST_LINK -b $ROM_MANIFEST_BRANCH &&
             repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync &&
-            break
-          done
         continue-on-error: true
 
       - name: Execute if the job is cancelled
