@@ -12,18 +12,17 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     env:
-      WORKING_DIR: "your_working_dir"
-      ROM_NAME: "your_rom_name"
-      LOCAL_MANIFEST: "your_local_manifest_link"
-      LOCAL_MANIFEST_BRANCH: "your_local_manifest_branch"
-      DEVICE_NAME: "device_codename"
-      LUNCH_NAME: "lunch_type"
-      ROM_MANIFEST_LINK: "your_rom_manifest_link"
-      ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
-      ANDROID_VERSION: "your_android_version"
-      TELEGRAM_USERNAME: "your_telegram_username"
-      GITHUB_UNAME: "your_github_username"
-      BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
+      WORKING_DIR: "pe"
+      ROM_NAME: "PixelExperience"
+      LOCAL_MANIFEST: "https://github.com/eartinityop/local_manifest"
+      LOCAL_MANIFEST_BRANCH: "pe"
+      DEVICE_NAME: "r5x"
+      PRODUCT_NAME: "aosp_r5x"
+      ROM_MANIFEST_LINK: "https://github.com/PixelExperience/manifest"
+      ROM_MANIFEST_BRANCH: "thirteen"
+      ANDROID_VERSION: "13"
+      TELEGRAM_USERNAME: "@Eartinity_AFK"
+      BUILD_TYPE: "userdebug" # or choose from 'eng', 'userdebug', 'user'
       
     steps:
       - name: Check-out to repository
