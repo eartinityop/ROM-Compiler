@@ -31,11 +31,11 @@ jobs:
       - name: Notify to telegram
         run: |
           text="Build has been started by $TELEGRAM_USERNAME($DEVICE_NAME) !
-ROM Name: $ROM_NAME
-ROM Branch: $ROM_MANIFEST_BRANCH
-Build Type: $BUILD_TYPE
-Android Version: $ANDROID_VERSION
-Job link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
+          ROM Name: $ROM_NAME
+          ROM Branch: $ROM_MANIFEST_BRANCH
+          Build Type: $BUILD_TYPE
+          Android Version: $ANDROID_VERSION
+          Job link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
           curl -s "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendmessage" -d "chat_id=${{ secrets.CHAT_ID }}" -d "text=$text"
 
       - name: Set-up workspace environment
