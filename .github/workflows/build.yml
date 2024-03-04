@@ -1,7 +1,7 @@
 name: Start build
 on:
   pull_request:
-    types: [opened]
+    types: [opened, closed]
     branches:
       - main
 
@@ -67,10 +67,10 @@ jobs:
         continue-on-error: true
 
       - name: Execute if the job is cancelled
-        if: ${{ cancelled() }}
+        if: ${{ cancelled() || github.event_name == 'closed' }}
         run: pwd && cd && pwd && cd actions-runner && cd work && rm -rf ROM-Compiler
 
-      - name: Start compiling $ROM_NAME
+      - name: Start compilation
         run: |
           . build/envsetup.sh
           lunch $LUNCH_NAME-$BUILD_TYPE
@@ -88,7 +88,8 @@ jobs:
           release_name: ${{ github.run_id }}  # Replace with your desired release name
           draft: false
           prerelease: false
-          repository: username/repo-name  # Replace with the username and repository name of the forked repository
+          owner: $GITHUB_UNAME
+          repo: ROM-Compiler
 
 
       # Upload your file as an asset to the release of the forked repository
