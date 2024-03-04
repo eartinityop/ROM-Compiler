@@ -22,8 +22,10 @@ jobs:
       ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
-      BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
+      BUILD_TYPE: "your_preferred_build_type" # or choose from 'eng', 'userdebug', 'user'
+    if: github.event_name != 'pull_request' || github.event.action != 'closed' # Skip job if the PR is closed
       
+
     steps:
       - name: Check-out to repository
         uses: actions/checkout@v4
@@ -128,12 +130,13 @@ jobs:
   cleanup:
     name: Clean up on PR close
     runs-on: self-hosted
+    needs: test
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     steps:
       - name: Clean up on PR close
         run: |
-          pwd
           cd 
-          cd actions-runner
-          cd work
-          rm -rf ROM-Compiler 
+          pwd 
+          cd actions-runner 
+          cd work 
+          rm -rf ROM-Compiler
