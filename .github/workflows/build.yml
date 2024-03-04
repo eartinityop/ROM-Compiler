@@ -96,8 +96,6 @@ jobs:
           echo "============================"
         continue-on-error: false
 
-      
-      # Cleanup before exiting
       - name: Cleanup directory
         if: failure()
         run: |
@@ -125,20 +123,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  cancel-workflow:
-    name: Cancel Workflow on PR Close
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.state == 'closed'
-    steps:
-      - name: Cancel Workflow
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const result = await github.actions.cancelWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            });
-            console.log(result);
-            
+  
