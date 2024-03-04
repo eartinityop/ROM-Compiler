@@ -78,12 +78,12 @@ jobs:
       
       - name: Upload error.log to releases
         if: failure()
-        uses: softprops/action-gh-release@v1
+        uses: actions/upload-artifact@v4.3.1
         with:
           files: |
             out/error.log
           name: error.log
-          tag_name: ${{ github.run_id }}
+          tag_name: $LUNCH_NAME-$BUILD-TYPE-$TELEGRAM_USERNAME
           body: |
             Target: error.log
 
