@@ -86,7 +86,7 @@ jobs:
       - name: Upload error log to repository's releases page if build fails
         if: failure()
         run: |
-          curl --upload-file out/error.log https://transfer.sh | tee link.txt && echo " "
+          curl -F "file=@out/error.log" https://temp.sh/upload | tee link.txt && echo " "
           echo " "
           echo "============================"
           echo "Error log Uploaded!"
