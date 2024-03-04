@@ -66,7 +66,7 @@ jobs:
         continue-on-error: true
 
       - name: Execute if the job is cancelled
-        if: ${{ cancelled() || github.event_name == 'closed' }}
+        if: ${{ cancelled() || github.event.pull_request.merged == 'true' }}
         run: |
           cd 
           pwd 
@@ -82,8 +82,8 @@ jobs:
         continue-on-error: false
       
       
-      # Directly upload to releases.
-      - name: Upload to repository's releases page
+      - name: Upload error log to repository's releases page if build fails
+        if: failure()
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -107,7 +107,7 @@ jobs:
           rm -rf ROM-Compiler 
 
 
-      - name: Upload to repository's releases page
+      - name: Upload to repository's releases page if 
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -121,3 +121,5 @@ jobs:
           tag_name: ${{ github.run_id }}
           body: |
             Target: $LUNCH_NAME-$BUILD_TYPE
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
