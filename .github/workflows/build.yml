@@ -23,10 +23,17 @@ jobs:
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
       BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
+      CHAT_ID: "${{ secrets.CHAT_ID}}"
+      BOT_TOKEN: "${{ secrets.BOT_TOKEN}}"
    
     steps:
       - name: Check-out to repository
         uses: actions/checkout@v4
+
+      - name: Check secrets
+        run: |
+          echo $CHAT_ID
+          echo $BOT_TOKEN
 
       - name: Notify to telegram
         run: |
