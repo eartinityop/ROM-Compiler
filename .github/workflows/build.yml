@@ -86,14 +86,14 @@ jobs:
       - name: Upload to repository's releases page
         uses: softprops/action-gh-release@v1
         with:
-        files: |
-          out/error.log
-        name: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
-        tag_name: ${{ github.run_id }}
-        body: |
-          Target: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            out/error.log
+          name: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
+          tag_name: ${{ github.run_id }}
+          body: |
+            Target: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       
       # Cleanup before exiting
