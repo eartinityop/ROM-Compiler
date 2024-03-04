@@ -9,8 +9,9 @@ jobs:
   test:
     name: Clone Manifest, Start Build
     runs-on: self-hosted
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+    strategy:
+      matrix:
+        pr_status: [open, closed]
     env:
       WORKING_DIR: "your_working_dir"
       ROM_NAME: "your_rom_name"
@@ -23,9 +24,8 @@ jobs:
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
       BUILD_TYPE: "your_preferred_build_type" # or choose from 'eng', 'userdebug', 'user'
-    if: github.event_name != 'pull_request' || github.event.action != 'closed' # Skip job if the PR is closed
+    if: matrix.pr_status == 'open' # Only run when PR is open
       
-
     steps:
       - name: Check-out to repository
         uses: actions/checkout@v4
@@ -131,7 +131,7 @@ jobs:
     name: Clean up on PR close
     runs-on: self-hosted
     needs: test
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    if: matrix.pr_status == 'closed' # Only run when PR is closed
     steps:
       - name: Clean up on PR close
         run: |
