@@ -36,7 +36,7 @@ jobs:
           Build Type: $BUILD_TYPE
           Android Version: $ANDROID_VERSION
           Job link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
-          curl -s "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendmessage" -d "chat_id=${{ secrets.CHAT_ID }}" -d "text=$text"
+          curl -s "https://api.telegram.org/bot5635044382:AAHO51tSZqRYUiHw8IB4VUJjNpbeqVQm-Uk/sendmessage" -d "chat_id=-1001803186438" -d "text=$text"
 
       - name: Set-up workspace environment
         run: |
