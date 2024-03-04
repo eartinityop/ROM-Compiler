@@ -17,12 +17,11 @@ jobs:
       LOCAL_MANIFEST: "your_local_manifest_link"
       LOCAL_MANIFEST_BRANCH: "your_local_manifest_branch"
       DEVICE_NAME: "device_codename"
-      LUNCH_NAME: "lunch_type"
+      PRODUCT_NAME: "lunch_type"
       ROM_MANIFEST_LINK: "your_rom_manifest_link"
       ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
-      GITHUB_UNAME: "your_github_username"
       BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
       
     steps:
@@ -78,37 +77,25 @@ jobs:
       - name: Start compilation
         run: |
           . build/envsetup.sh
-          lunch $LUNCH_NAME-$BUILD_TYPE
+          lunch $PRODUCT_NAME-$BUILD_TYPE
           mka bacon
         continue-on-error: false
       
-      - name: Create Release
-        if: failure()
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}  # Use the personal access token from the forked repository owner
+      
+      # Directly upload to releases.
+      - name: Upload to repository's releases page
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: $LUNCH_NAME-$BUILD_TYPE-$GITHUB_UNAME  # Replace with your desired tag name
-          release_name: ${{ github.run_id }}  # Replace with your desired release name
-          draft: false
-          prerelease: false
-          owner: $GITHUB_UNAME
-          repo: ROM-Compiler
+        files: |
+          out/error.log
+        name: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
+        tag_name: ${{ github.run_id }}
+        body: |
+          Target: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-      # Upload your file as an asset to the release of the forked repository
-      - name: Upload Asset
-        if: failure()
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}  # Use the personal access token from the forked repository owner
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: out/error.log  # Replace with the path to your file
-          asset_name: error.log  # Replace with the name you want the file to have in the release
-          asset_content_type: text/plain  # Replace with the appropriate content type for your file
-
+      
       # Cleanup before exiting
       - name: Cleanup directory
         if: failure()
