@@ -21,18 +21,22 @@ jobs:
       ROM_MANIFEST_LINK: "your_rom_manifest_link"
       ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
       ANDROID_VERSION: "your_android_version"
+      TELEGRAM_USERNAME: "your_telegram_username"
       BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
-      chat_id: ${{ secrets.CHAT_ID }}
-      bot_token: ${{ secrets.BOT_TOKEN }}
-      text: "Build for $DEVICE_NAME has been started!\nROM Name: $ROM_NAME\nROM Branch: $ROM_MANIFEST_BRANCH\nBUILD Type: $BUILD_TYPE\nANDROID Version: $ANDROID_VERSION\nJob link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
-
+   
     steps:
       - name: Check-out to repository
         uses: actions/checkout@v4
 
       - name: Notify to telegram
         run: |
-          curl -s "https://api.telegram.org/bot$bot_token/sendmessage" -d "chat_id=$chat_id" -d "text=$text"
+          text="Build has been started by $TELEGRAM_USERNAME($DEVICE_NAME) !
+ROM Name: $ROM_NAME
+ROM Branch: $ROM_MANIFEST_BRANCH
+Build Type: $BUILD_TYPE
+Android Version: $ANDROID_VERSION
+Job link: https://github.com/AOSP-Builders/ROM-Compiler/actions/runs/${{ github.run_id }}"
+          curl -s "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendmessage" -d "chat_id=${{ secrets.CHAT_ID }}" -d "text=$text"
 
       - name: Set-up workspace environment
         run: |
