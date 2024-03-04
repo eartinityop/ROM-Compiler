@@ -1,7 +1,7 @@
 name: Start build
 on:
   pull_request:
-    types: [opened, closed]
+    types: [opened]
     branches:
       - main
 
@@ -9,22 +9,21 @@ jobs:
   test:
     name: Clone Manifest, Start Build
     runs-on: self-hosted
-    strategy:
-      matrix:
-        pr_status: [open, closed]
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     env:
       WORKING_DIR: "your_working_dir"
       ROM_NAME: "your_rom_name"
       LOCAL_MANIFEST: "your_local_manifest_link"
       LOCAL_MANIFEST_BRANCH: "your_local_manifest_branch"
       DEVICE_NAME: "device_codename"
-      PRODUCT_NAME: "lunch_type"
+      LUNCH_NAME: "lunch_type"
       ROM_MANIFEST_LINK: "your_rom_manifest_link"
       ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
-      BUILD_TYPE: "your_preferred_build_type" # or choose from 'eng', 'userdebug', 'user'
-    if: matrix.pr_status == 'open' # Only run when PR is open
+      GITHUB_UNAME: "your_github_username"
+      BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
       
     steps:
       - name: Check-out to repository
@@ -127,16 +126,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  cleanup:
-    name: Clean up on PR close
-    runs-on: self-hosted
-    needs: test
-    if: matrix.pr_status == 'closed' # Only run when PR is closed
+  cancel-workflow:
+    name: Cancel Workflow on PR Close
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.state == 'closed'
     steps:
-      - name: Clean up on PR close
-        run: |
-          cd 
-          pwd 
-          cd actions-runner 
-          cd work 
-          rm -rf ROM-Compiler
+      - name: Cancel Workflow
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const result = await github.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+            console.log(result);
+            
