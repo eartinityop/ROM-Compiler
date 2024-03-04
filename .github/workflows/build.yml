@@ -68,7 +68,12 @@ jobs:
 
       - name: Execute if the job is cancelled
         if: ${{ cancelled() || github.event_name == 'closed' }}
-        run: pwd && cd && pwd && cd actions-runner && cd work && rm -rf ROM-Compiler
+        run: |
+          cd 
+          pwd 
+          cd actions-runner 
+          cd work 
+          rm -rf ROM-Compiler
 
       - name: Start compilation
         run: |
