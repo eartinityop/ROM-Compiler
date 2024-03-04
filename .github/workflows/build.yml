@@ -22,6 +22,7 @@ jobs:
       ROM_MANIFEST_BRANCH: "your_rom_manifest_branch"
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
+      GITHUB_UNAME: "your_github_username"
       BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
       
     steps:
@@ -76,16 +77,31 @@ jobs:
           mka bacon
         continue-on-error: false
       
-      - name: Upload error.log to releases
+      - name: Create Release
         if: failure()
-        uses: actions/upload-artifact@v4.3.1
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}  # Use the personal access token from the forked repository owner
         with:
-          files: |
-            out/error.log
-          name: error.log
-          tag_name: $LUNCH_NAME-$BUILD-TYPE-$TELEGRAM_USERNAME
-          body: |
-            Target: error.log
+          tag_name: $LUNCH_NAME-$BUILD_TYPE-$GITHUB_UNAME  # Replace with your desired tag name
+          release_name: ${{ github.run_id }}  # Replace with your desired release name
+          draft: false
+          prerelease: false
+          repository: username/repo-name  # Replace with the username and repository name of the forked repository
+
+      # Upload your file as an asset to the release of the forked repository
+      - name: Upload Asset
+        if: failure()
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}  # Use the personal access token from the forked repository owner
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: out/error.log  # Replace with the path to your file
+          asset_name: error.log  # Replace with the name you want the file to have in the release
+          asset_content_type: text/plain  # Replace with the appropriate content type for your file
+
 
       - name: Upload to repository's releases page
         uses: softprops/action-gh-release@v1
