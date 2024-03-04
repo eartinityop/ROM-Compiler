@@ -94,6 +94,7 @@ jobs:
             Target: $PRODUCT_NAME-$BUILD_TYPE-$TELEGRAM_USERNAME
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
 
       
       # Cleanup before exiting
@@ -123,3 +124,16 @@ jobs:
             Target: $LUNCH_NAME-$BUILD_TYPE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup:
+    name: Clean up on PR close
+    runs-on: self-hosted
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    steps:
+      - name: Clean up on PR close
+        run: |
+          pwd
+          cd 
+          cd actions-runner
+          cd work
+          rm -rf ROM-Compiler 
