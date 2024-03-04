@@ -23,17 +23,10 @@ jobs:
       ANDROID_VERSION: "your_android_version"
       TELEGRAM_USERNAME: "your_telegram_username"
       BUILD_TYPE: "your_preffered_build_type" # or choose from 'eng', 'userdebug', 'user'
-      CHAT_ID: "${{ secrets.CHAT_ID}}"
-      BOT_TOKEN: "${{ secrets.BOT_TOKEN}}"
-   
+      
     steps:
       - name: Check-out to repository
         uses: actions/checkout@v4
-
-      - name: Check secrets
-        run: |
-          echo $CHAT_ID
-          echo $BOT_TOKEN
 
       - name: Notify to telegram
         run: |
@@ -61,6 +54,7 @@ jobs:
         run: |
           rm -rf .repo/local_manifests 
           git clone $LOCAL_MANIFEST -b $LOCAL_MANIFEST_BRANCH .repo/local_manifests
+        continue-on-error: false
 
       - name: Start syncing the repository 
         run: |
@@ -107,5 +101,3 @@ jobs:
           tag_name: ${{ github.run_id }}
           body: |
             Target: $LUNCH_NAME-$BUILD_TYPE
-        env:
-          TOKEN: ${{ secrets.TOKEN }}
