@@ -58,7 +58,7 @@ jobs:
             repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync &&
             break
           done
-         continue-on-error: true
+        continue-on-error: true
 
       - name: Execute if the job is cancelled
         if: ${{ cancelled() }}
